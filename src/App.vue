@@ -3,7 +3,10 @@ import axios from 'axios';
 import { store } from './store.js';
 
 // Components
-// import HelloWorld from './components/HelloWorld.vue';
+import AppSideBar from './components/AppSideBar.vue';
+import AppNavbar from './components/AppNavbar.vue';
+import AppMain from './components/AppMain.vue';
+import AppSearchBar from './components/AppSearchBar.vue';
 
 
 export default {
@@ -12,9 +15,109 @@ export default {
       store,
 
     }
+
+  },
+
+  methods: {
+    CallResearch(parameter) {
+      this.store.ApiResearchArray = [];
+      this.store.isSearch = true;
+      //Chiamata di ricerca
+      axios.get(this.store.ApibaseNew + parameter + '&page=1&include_adult=false').then((res) => {
+        res.data.results.forEach(element => {
+          if (element.media_type != "person") {
+
+            this.store.ApiResearchArray.push(element);
+
+          }
+        });
+
+        this.store.isLoading = false;
+        console.log("ok funziono, ecco l'array riempito")
+        console.log(this.store.ApiResearchArray)
+
+
+        this.store.researchinput = '';
+
+      }).catch((err) => {
+        console.log('errore nella chiamata api');
+        console.log(err)
+
+        this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+      });
+
+      setTimeout(
+        () => {
+          if (this.store.ApiResearchArray.length < 1) {
+            this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+          } else {
+            this.store.comm = ''
+          }
+        }
+        , 300)
+
+
+
+    }
+
+
+  },
+
+  created() {
+    this.store.isLoading = true;
+
+    //Chiamata per trend giornaliero generico
+    axios.get('https://api.themoviedb.org/3/trending/all/day?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT').then((res) => {
+      res.data.results.forEach(element => {
+
+        this.store.ApiTrendDailyArray.push(element);
+      });
+
+      this.store.isLoading = false;
+      //console.log(this.store.ApiTrendDailyArray)
+
+    }).catch((err) => {
+      console.log('errore nella chiamata api')
+    });
+
+    //Chiamata per trend settimanale generico
+    axios.get('https://api.themoviedb.org/3/trending/all/week?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT').then((res) => {
+      res.data.results.forEach(element => {
+
+        this.store.ApiTrendWeekArray.push(element);
+      });
+
+      this.store.isLoading = false;
+      //console.log(this.store.ApiTrendWeekArray)
+
+    }).catch((err) => {
+      console.log('errore nella chiamata api')
+    });
+
+    //Chiamata per serietv
+    axios.get('https://api.themoviedb.org/3/trending/tv/week?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT').then((res) => {
+      res.data.results.forEach(element => {
+
+        this.store.Apigenre.push(element);
+      });
+
+      this.store.isLoading = false;
+      //console.log(this.store.Apigenre)
+
+    }).catch((err) => {
+      console.log('errore nella chiamata api')
+    });
+
+
+
+
   },
 
   components: {
+    AppSideBar,
+    AppNavbar,
+    AppMain,
+    AppSearchBar,
 
   },
 
@@ -23,8 +126,17 @@ export default {
 </script>
 
 <template>
-  <div class="main-container">
+  <div class="is-loading" v-if="store.isLoading">Caricamento..</div>
 
+  <div class="main-container">
+    <AppSideBar></AppSideBar>
+    <div class="right-side">
+      <AppNavbar></AppNavbar>
+      <AppSearchBar @search="CallResearch(this.store.researchinput)" class="appSearchBar"></AppSearchBar>
+      <AppMain></AppMain>
+
+
+    </div>
   </div>
 </template>
 
@@ -34,5 +146,32 @@ export default {
 .main-container {
   width: 100%;
   height: 100vh;
+
+  display: flex;
+
+  .right-side {
+    @include d-flex-col-center();
+    width: calc(100% - 40px);
+    z-index: 1;
+  }
+
+}
+
+.appSearchBar {
+  z-index: 3;
+}
+
+.is-loading {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 3em;
+  z-index: 5;
 }
 </style>

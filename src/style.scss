@@ -17,7 +17,37 @@
 }
 
 * {
+  font-family: 'Kanit', sans-serif;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+.btn {
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgb(167, 167, 167);
+  padding: .5em;
+  border-radius: 10px;
+
+  &:hover {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.297);
+    color: white;
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
