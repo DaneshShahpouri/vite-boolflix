@@ -13,12 +13,17 @@ export default {
     }
   },
 
-  emits: ['searchFilm', 'searchSeries'],
+  emits: ['searchFilm', 'searchSeries', 'startCarosell'],
 
   methods: {
     goHome() {
       this.store.isSearchBar = false;
       this.store.isSearch = false;
+      this.store.isMorePage = false;
+
+      clearInterval(this.store.carosellTime);
+      this.store.carosellTime;
+
     }
   }
 }
@@ -33,7 +38,7 @@ export default {
 
 
     <div class="types-prod">
-      <div class="icon home" @click="goHome()">
+      <div class="icon home" @click="goHome(), $emit('startCarosell')">
         <i class="fa-solid fa-house"></i>
         <div class="info-icon">home</div>
       </div>

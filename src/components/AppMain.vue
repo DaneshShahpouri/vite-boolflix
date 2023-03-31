@@ -13,6 +13,8 @@ export default {
     }
   },
 
+  emits: ['prevpage', 'nextpage'],
+
   methods: {
     scrollLeftThumb(index) {
       let container = document.querySelectorAll('.wrapper-thumb-bar');
@@ -82,6 +84,7 @@ export default {
         } else if (this.store.isSerie && this.store.globalindex == this.store.Apigenre.length) {
           this.store.globalindex = 0;
         }
+        //console.log('intervallo attivo dal click della miniatura')
 
         this.store.isAnimate = true;
 
@@ -96,6 +99,7 @@ export default {
 
   mounted() {
     this.changeIndexGlobal();
+    //console.log('intervallo partito dal mounted del main')
   }
 }
 </script>
@@ -130,13 +134,13 @@ export default {
 
               <!-- Tipo -->
               <div class="info-type" v-if="this.store.isDaily">
-                {{ this.store.ApiTrendDailyArray[this.store.globalindex].media_type }}
+                {{ this.store.ApiTrendDailyArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
               </div>
               <div class="info-type" v-if="this.store.isWeekly">
-                {{ this.store.ApiTrendWeekArray[this.store.globalindex].media_type }}
+                {{ this.store.ApiTrendWeekArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
               </div>
               <div class="info-type" v-if="this.store.isSerie">
-                {{ this.store.Apigenre[this.store.globalindex].media_type }}
+                {{ this.store.Apigenre[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
               </div>
 
               <!-- Stelle -->
@@ -250,18 +254,18 @@ export default {
               <!-- data -->
               <div class="release-date" v-if="this.store.isDaily">
                 {{ store.ApiTrendDailyArray[this.store.globalindex].media_type == "movie" ?
-                  store.ApiTrendDailyArray[this.store.globalindex].release_date :
-                  store.ApiTrendDailyArray[this.store.globalindex].first_air_date }}
+                  store.ApiTrendDailyArray[this.store.globalindex].release_date.substr(0, 4) :
+                  store.ApiTrendDailyArray[this.store.globalindex].first_air_date.substr(0, 4) }}
               </div>
               <div class="release-date" v-if="this.store.isWeekly">
                 {{ store.ApiTrendWeekArray[this.store.globalindex].media_type == "movie" ?
-                  store.ApiTrendWeekArray[this.store.globalindex].release_date :
-                  store.ApiTrendWeekArray[this.store.globalindex].first_air_date }}
+                  store.ApiTrendWeekArray[this.store.globalindex].release_date.substr(0, 4) :
+                  store.ApiTrendWeekArray[this.store.globalindex].first_air_date.substr(0, 4) }}
               </div>
               <div class="release-date" v-if="this.store.isSerie">
                 {{ store.Apigenre[this.store.globalindex].media_type == "movie" ?
-                  store.Apigenre[this.store.globalindex].release_date :
-                  store.Apigenre[this.store.globalindex].first_air_date }}
+                  store.Apigenre[this.store.globalindex].release_date.substr(0, 4) :
+                  store.Apigenre[this.store.globalindex].first_air_date.substr(0, 4) }}
               </div>
 
               <div class="lang" v-if="this.store.isDaily">
@@ -468,20 +472,31 @@ export default {
 
         <span class="comunication-span" v-if="this.store.comm != ''">{{ this.store.comm }}</span>
 
-        <div class="card-search" v-for="element in this.store.ApiResearchArray">
+        <div class="pages" v-if="this.store.isMorePage">
+          <div class="prevpage" @click="$emit('prevpage')" v-if="this.store.PagNum > 1"><i
+              class="fa-solid fa-arrow-left"></i></div>
+          <div class="prevpage" v-if="this.store.PagNum <= 1"></div>
+          <span>page {{ this.store.PagNum }}</span>
+          <div class="nextpage" @click="$emit('nextpage')"><i class="fa-solid fa-arrow-right"></i></div>
+        </div>
+
+        <div class="card-search" v-for="element in this.store.ApiResearchArray"
+          v-if="this.store.ApiResearchArray.length > 0">
 
           <div class="info-wrapper">
             <span class="title">
 
               <strong>
-                {{ element.media_type == "movie" ? element.title : element.name }}
+                {{ this.store.isFilmResearch ? element.title : (element.media_type == "movie" ? element.title :
+                  element.name) }}
               </strong>
             </span>
             <span class="original-title">
 
               Original Title:
               <strong>
-                {{ element.media_type == "movie" ? element.original_title : element.original_name }}
+                {{ this.store.isFilmResearch ? element.original_title : (element.media_type == "movie" ?
+                  element.original_title : element.original_name) }}
               </strong>
 
               <!-- Voto -->
@@ -518,7 +533,9 @@ export default {
             </div>
 
             <div class="release-date">
-              {{ element.media_type == "movie" ? element.release_date : element.first_air_date }}
+              {{ this.store.isFilmResearch ? element.release_date : (element.media_type == "movie" ? element.release_date
+                :
+                element.first_air_date) }}
             </div>
 
             <div class="lang">
@@ -654,7 +671,7 @@ export default {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: 150px;
+          object-position: 150px top;
 
         }
 
@@ -875,6 +892,30 @@ export default {
     align-content: flex-start;
     justify-content: center;
 
+    .pages {
+      position: absolute;
+      top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 1em;
+
+      span {
+        color: grey;
+        cursor: default;
+      }
+
+      .prevpage,
+      .nextpage {
+        font-size: .8em;
+        padding: 1em;
+        color: rgb(163, 163, 163);
+        cursor: pointer;
+
+        &:hover {
+          color: white;
+        }
+      }
+    }
 
     .comunication-span {
       font-size: 1.2em;

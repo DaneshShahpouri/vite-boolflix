@@ -67,11 +67,11 @@
 
 @keyframes appearImgtoLeft {
   0% {
-    object-position: 0;
+    object-position: 0 top;
   }
 
   100% {
-    object-position: 150px;
+    object-position: 150px top;
   }
 }
 

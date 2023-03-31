@@ -4,6 +4,7 @@ export const store = reactive({
     call: '',
     researchinput: '',
     globalindex: 0,
+    lastcall: '',
 
     //Api componenets
     APIBase: 'https://api.themoviedb.org/3',
@@ -39,6 +40,9 @@ export const store = reactive({
     isGeneralResearch: false,
     isFilmResearch: false,
     isSerieResearch: false,
+
+    isMorePage: false,
+    PagNum: 1,
 
 
     //ServerStatus

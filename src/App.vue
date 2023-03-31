@@ -22,6 +22,10 @@ export default {
     CallResearch(parameter) {
       this.store.ApiResearchArray = [];
       this.store.isSearch = true;
+      this.store.PagNum = 1;
+      this.store.lastcall = '';
+
+      clearInterval(this.store.carosellTime);
 
       if (this.store.isGeneralResearch) {
         this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
@@ -30,7 +34,66 @@ export default {
       } else if (this.store.isSerieResearch) {
         this.store.call = 'https://api.themoviedb.org/3/search/' + 'tv' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
       }
+      this.store.lastcall = this.store.researchinput;
+
       //Chiamata di ricerca
+      axios.get(this.store.call).then((res) => {
+        res.data.results.forEach(element => {
+          if (element.media_type != "person") {
+
+            this.store.ApiResearchArray.push(element);
+
+          }
+
+        });
+
+        this.store.isLoading = false;
+
+        if (this.store.ApiResearchArray.length == 20) {
+          this.store.isMorePage = true;
+        } else if (this.store.PagNum <= 1) {
+          this.store.isMorePage = false;
+        }
+
+        this.store.researchinput = '';
+
+      }).catch((err) => {
+        console.log('errore nella chiamata api');
+
+        this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+
+
+      });
+
+      setTimeout(
+        () => {
+          if (this.store.ApiResearchArray.length < 1) {
+            this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+          } else {
+            this.store.comm = ''
+          }
+        }
+        , 1000)
+
+
+
+
+    },
+
+    CallResearchPage() {
+      this.store.ApiResearchArray = [];
+      this.store.isSearch = true;
+
+
+
+      if (this.store.isGeneralResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.lastcall + '&page=' + this.store.PagNum + '&include_adult=false'
+      } else if (this.store.isFilmResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'movie' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.lastcall + '&page=' + this.store.PagNum + '&include_adult=false'
+      } else if (this.store.isSerieResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'tv' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.lastcall + '&page=' + this.store.PagNum + '&include_adult=false'
+      }
+
       axios.get(this.store.call).then((res) => {
         res.data.results.forEach(element => {
           if (element.media_type != "person") {
@@ -41,14 +104,20 @@ export default {
         });
 
         this.store.isLoading = false;
-        //console.log(this.store.ApibaseNew + parameter + '&page=1&include_adult=false')
 
+        //Controllo dell'ultima pagina
+        if (this.store.ApiResearchArray.length == 20) {
+          this.store.isMorePage = true;
+        } else if (this.store.PagNum == 1) {
+          this.store.isMorePage = false;
+        } else if (this.store.ApiResearchArray.length == 0) {
+          this.store.PagNum = 1;
+          this.CallResearchPage()
+        }
 
         this.store.researchinput = '';
 
       }).catch((err) => {
-        console.log('errore nella chiamata api');
-
 
         this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
       });
@@ -61,14 +130,27 @@ export default {
             this.store.comm = ''
           }
         }
-        , 500)
+        , 1000)
 
+    },
 
+    prevpageCall() {
+      if (this.store.PagNum > 1) {
+        this.store.PagNum--;
+        this.CallResearchPage()
+      }
+    },
 
+    nextpageCall() {
+
+      store.PagNum++
+
+      this.CallResearchPage()
 
     },
 
     CallResearchFilm() {
+      this.store.isMorePage = false;
       this.store.isSearchBar = true;
       this.activeFilmStatus();
       this.store.ApiResearchArray = [];
@@ -87,15 +169,13 @@ export default {
         });
 
         this.store.isLoading = false;
-        //console.log("ok funziono, ecco l'array riempito")
-        //console.log(this.store.ApiResearchArray)
+
 
 
         this.store.researchinput = '';
 
       }).catch((err) => {
-        //console.log('errore nella chiamata api');
-        //console.log(err)
+
 
         this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
       });
@@ -115,6 +195,7 @@ export default {
     },
 
     CallResearchSerie() {
+      this.store.isMorePage = false;
       this.store.isSearchBar = true;
       this.activeSerieStatus();
       this.store.ApiResearchArray = [];
@@ -133,16 +214,12 @@ export default {
         });
 
         this.store.isLoading = false;
-        //console.log("ok funziono, ecco l'array riempito")
-        //console.log(this.store.ApiResearchArray)
+
 
 
         this.store.researchinput = '';
 
       }).catch((err) => {
-        //console.log('errore nella chiamata api');
-        //console.log(err)
-
         this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
       });
 
@@ -165,28 +242,26 @@ export default {
       this.store.isGeneralResearch = true;
       this.store.isFilmResearch = false;
       this.store.isSerieResearch = false;
-      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
-      //console.log('status ricerca film: ' + this.store.isFilmResearch)
-      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
+
+      clearInterval(this.store.carosellTime);
+
     },
 
     activeFilmStatus() {
       this.store.isGeneralResearch = false;
       this.store.isFilmResearch = true;
       this.store.isSerieResearch = false;
-      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
-      //console.log('status ricerca film: ' + this.store.isFilmResearch)
-      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
+
+      clearInterval(this.store.carosellTime);
     },
 
     activeSerieStatus() {
       this.store.isGeneralResearch = false;
       this.store.isFilmResearch = false;
       this.store.isSerieResearch = true;
-      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
-      //console.log('status ricerca film: ' + this.store.isFilmResearch)
-      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
-    }
+
+      clearInterval(this.store.carosellTime);
+    },
 
 
   },
@@ -263,9 +338,9 @@ export default {
     <AppSideBar @attiva-stato-ricerca-generale="activeGeneralStatus()" @attiva-stato-ricerca-film="activeFilmStatus()"
       @attiva-stato-ricerca-serie="activeSerieStatus()"></AppSideBar>
     <div class="right-side">
-      <AppNavbar @searchFilm="CallResearchFilm()" @searchSeries="CallResearchSerie()"></AppNavbar>
+      <AppNavbar @start-carosell="" @searchFilm="CallResearchFilm()" @searchSeries="CallResearchSerie()"></AppNavbar>
       <AppSearchBar @search="CallResearch(this.store.researchinput)" class="appSearchBar"></AppSearchBar>
-      <AppMain></AppMain>
+      <AppMain @nextpage="nextpageCall()" @prevpage="prevpageCall()"></AppMain>
 
 
     </div>
