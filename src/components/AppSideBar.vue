@@ -13,9 +13,7 @@ export default {
     }
   },
 
-  emits: {
-
-  },
+  emits: ['attivaStatoRicercaGenerale', 'attivaStatoRicercaFilm', 'attivaStatoRicercaSerie'],
 
   methods: {
     accedi() {
@@ -37,10 +35,18 @@ export default {
     changeSearchbar() {
       if (this.store.isSearchBar) {
         this.store.isSearchBar = false
+        //console.log('sono false')
       } else {
         this.store.isSearchBar = true;
+        //console.log('sono true')
       }
+
     },
+    forceChangeSearchbar() {
+      this.store.isSearchBar = true;
+    }
+
+
   },
 }
 </script>
@@ -50,16 +56,18 @@ export default {
 
     <div class="icons">
 
-      <div class="icon-wrapper search" @click="changeSearchbar()">
+      <div class="icon-wrapper search" @click="changeSearchbar(), $emit('attivaStatoRicercaGenerale')">
         <i class="fa-solid fa-magnifying-glass"></i>
 
         <div class="icon-menu-position">
           <div class="menu">
             <ul>
-              <li id="newResearch" @click="changeSearchbar()">Nuova Ricerca..</li>
-              <li @click="changeSearchbar()">Cerca film</li>
-              <li @click="changeSearchbar()">Cerca serie</li>
-              <li @click="changeSearchbar()">Cerca Kids</li>
+              <li id="newResearch" @click.stop="forceChangeSearchbar(), $emit('attivaStatoRicercaGenerale')">Nuova
+                Ricerca..
+              </li>
+              <li @click.stop.prevent="forceChangeSearchbar(), $emit('attivaStatoRicercaFilm')">Cerca film</li>
+              <li @click.stop.prevent="forceChangeSearchbar(), $emit('attivaStatoRicercaSerie')">Cerca serie</li>
+              <li @click.stop.prevent="forceChangeSearchbar()">Cerca Kids</li>
             </ul>
           </div>
         </div>
@@ -180,7 +188,7 @@ export default {
           top: 0px;
 
           display: none;
-          z-index: 2;
+          z-index: 3;
 
           padding: .5em;
 
@@ -210,6 +218,7 @@ export default {
               cursor: pointer;
               font-weight: 100;
               text-align: center;
+              z-index: 3;
 
 
 

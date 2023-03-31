@@ -13,6 +13,8 @@ export default {
     }
   },
 
+  emits: ['searchFilm', 'searchSeries'],
+
   methods: {
     goHome() {
       this.store.isSearchBar = false;
@@ -36,12 +38,12 @@ export default {
         <div class="info-icon">home</div>
       </div>
 
-      <div class="icon tv-series">
+      <div class="icon tv-series" @click="$emit('searchSeries')">
         <i class="fa-solid fa-tv"></i>
         <div class="info-icon">SerieTv</div>
       </div>
 
-      <div class="icon film">
+      <div class="icon film" @click="$emit('searchFilm')">
         <i class="fa-solid fa-film"></i>
         <div class="info-icon">Film</div>
       </div>
@@ -76,7 +78,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 2;
+  z-index: 4;
 
   .logo-wrapper {
     width: 100px;
@@ -86,7 +88,9 @@ export default {
 
     padding-left: 1em;
     font-size: 2em;
-    font-weight: 800;
+    font-weight: 300;
+    text-shadow: .4px .5px rgba(255, 255, 255, 0.427);
+
 
     color: $secondary;
   }

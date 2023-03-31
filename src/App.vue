@@ -22,8 +22,16 @@ export default {
     CallResearch(parameter) {
       this.store.ApiResearchArray = [];
       this.store.isSearch = true;
+
+      if (this.store.isGeneralResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
+      } else if (this.store.isFilmResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'movie' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
+      } else if (this.store.isSerieResearch) {
+        this.store.call = 'https://api.themoviedb.org/3/search/' + 'tv' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
+      }
       //Chiamata di ricerca
-      axios.get(this.store.ApibaseNew + parameter + '&page=1&include_adult=false').then((res) => {
+      axios.get(this.store.call).then((res) => {
         res.data.results.forEach(element => {
           if (element.media_type != "person") {
 
@@ -33,15 +41,14 @@ export default {
         });
 
         this.store.isLoading = false;
-        console.log("ok funziono, ecco l'array riempito")
-        console.log(this.store.ApiResearchArray)
+        //console.log(this.store.ApibaseNew + parameter + '&page=1&include_adult=false')
 
 
         this.store.researchinput = '';
 
       }).catch((err) => {
         console.log('errore nella chiamata api');
-        console.log(err)
+
 
         this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
       });
@@ -54,10 +61,131 @@ export default {
             this.store.comm = ''
           }
         }
-        , 300)
+        , 500)
 
 
 
+
+    },
+
+    CallResearchFilm() {
+      this.store.isSearchBar = true;
+      this.activeFilmStatus();
+      this.store.ApiResearchArray = [];
+      this.store.isSearch = true;
+
+      let firstcall = 'https://api.themoviedb.org/3/trending/movie/week' + this.store.APIKey + '&include_adult=false';
+
+      //Chiamata di ricerca
+      axios.get(firstcall).then((res) => {
+        res.data.results.forEach(element => {
+          if (element.media_type != "person") {
+
+            this.store.ApiResearchArray.push(element);
+
+          }
+        });
+
+        this.store.isLoading = false;
+        //console.log("ok funziono, ecco l'array riempito")
+        //console.log(this.store.ApiResearchArray)
+
+
+        this.store.researchinput = '';
+
+      }).catch((err) => {
+        //console.log('errore nella chiamata api');
+        //console.log(err)
+
+        this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+      });
+
+      setTimeout(
+        () => {
+          if (this.store.ApiResearchArray.length < 1) {
+            this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+          } else {
+            this.store.comm = ''
+          }
+        }
+        , 400)
+
+
+
+    },
+
+    CallResearchSerie() {
+      this.store.isSearchBar = true;
+      this.activeSerieStatus();
+      this.store.ApiResearchArray = [];
+      this.store.isSearch = true;
+
+      let firstcall = 'https://api.themoviedb.org/3/trending/tv/week' + this.store.APIKey + '&page=1&include_adult=false'
+
+      //Chiamata di ricerca
+      axios.get(firstcall).then((res) => {
+        res.data.results.forEach(element => {
+          if (element.media_type != "person") {
+
+            this.store.ApiResearchArray.push(element);
+
+          }
+        });
+
+        this.store.isLoading = false;
+        //console.log("ok funziono, ecco l'array riempito")
+        //console.log(this.store.ApiResearchArray)
+
+
+        this.store.researchinput = '';
+
+      }).catch((err) => {
+        //console.log('errore nella chiamata api');
+        //console.log(err)
+
+        this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+      });
+
+      setTimeout(
+        () => {
+          if (this.store.ApiResearchArray.length < 1) {
+            this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+          } else {
+            this.store.comm = ''
+          }
+        }
+        , 400)
+
+
+
+    },
+
+    //Attivatori Stati Generali
+    activeGeneralStatus() {
+      this.store.isGeneralResearch = true;
+      this.store.isFilmResearch = false;
+      this.store.isSerieResearch = false;
+      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
+      //console.log('status ricerca film: ' + this.store.isFilmResearch)
+      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
+    },
+
+    activeFilmStatus() {
+      this.store.isGeneralResearch = false;
+      this.store.isFilmResearch = true;
+      this.store.isSerieResearch = false;
+      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
+      //console.log('status ricerca film: ' + this.store.isFilmResearch)
+      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
+    },
+
+    activeSerieStatus() {
+      this.store.isGeneralResearch = false;
+      this.store.isFilmResearch = false;
+      this.store.isSerieResearch = true;
+      //console.log('status ricerca generale: ' + this.store.isGeneralResearch)
+      //console.log('status ricerca film: ' + this.store.isFilmResearch)
+      //console.log('status ricerca serie: ' + this.store.isSerieResearch)
     }
 
 
@@ -74,10 +202,11 @@ export default {
       });
 
       this.store.isLoading = false;
-      //console.log(this.store.ApiTrendDailyArray)
+      ////console.log(this.store.ApiTrendDailyArray)
 
     }).catch((err) => {
-      console.log('errore nella chiamata api')
+      console.log('errore nella chiamata api');
+      this.store.isLoading = false;
     });
 
     //Chiamata per trend settimanale generico
@@ -91,7 +220,8 @@ export default {
       //console.log(this.store.ApiTrendWeekArray)
 
     }).catch((err) => {
-      console.log('errore nella chiamata api')
+      console.log('errore nella chiamata api');
+      this.store.isLoading = false;
     });
 
     //Chiamata per serietv
@@ -105,7 +235,8 @@ export default {
       //console.log(this.store.Apigenre)
 
     }).catch((err) => {
-      console.log('errore nella chiamata api')
+      console.log('errore nella chiamata api');
+      this.store.isLoading = false;
     });
 
 
@@ -129,9 +260,10 @@ export default {
   <div class="is-loading" v-if="store.isLoading">Caricamento..</div>
 
   <div class="main-container">
-    <AppSideBar></AppSideBar>
+    <AppSideBar @attiva-stato-ricerca-generale="activeGeneralStatus()" @attiva-stato-ricerca-film="activeFilmStatus()"
+      @attiva-stato-ricerca-serie="activeSerieStatus()"></AppSideBar>
     <div class="right-side">
-      <AppNavbar></AppNavbar>
+      <AppNavbar @searchFilm="CallResearchFilm()" @searchSeries="CallResearchSerie()"></AppNavbar>
       <AppSearchBar @search="CallResearch(this.store.researchinput)" class="appSearchBar"></AppSearchBar>
       <AppMain></AppMain>
 
@@ -158,7 +290,7 @@ export default {
 }
 
 .appSearchBar {
-  z-index: 3;
+  z-index: 4;
 }
 
 .is-loading {

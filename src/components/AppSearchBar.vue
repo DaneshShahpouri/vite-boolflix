@@ -11,15 +11,20 @@ export default {
       store,
 
     }
-  }
+  },
+
+  emits:
+    ['search']
+
 }
 </script>
 
 <template>
   <div class="container" v-if="this.store.isSearchBar">
     <div class="search-input-wrapper">
-      <input type="text" placeholder="Cerca un film o una serie" v-model="this.store.researchinput"
-        @keyup.enter="$emit('search')">
+      <input type="text"
+        :placeholder="this.store.isGeneralResearch ? 'Cerca un film o una serie' : (this.store.isFilmResearch ? 'Cerca un film' : 'Cerca una serie')"
+        v-model="this.store.researchinput" @keyup.enter="$emit('search')">
     </div>
   </div>
 </template>

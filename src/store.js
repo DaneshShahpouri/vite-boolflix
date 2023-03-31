@@ -1,7 +1,9 @@
 import { reactive } from 'vue';
 
 export const store = reactive({
+    call: '',
     researchinput: '',
+    globalindex: 0,
 
     //Api componenets
     APIBase: 'https://api.themoviedb.org/3',
@@ -33,9 +35,22 @@ export const store = reactive({
     isSearch: false,
     isSearchBar: false,
 
+    isAnimate: false,
+    isGeneralResearch: false,
+    isFilmResearch: false,
+    isSerieResearch: false,
+
+
+    //ServerStatus
+    isDaily: true,
+    isWeekly: false,
+    isSerie: false,
+
     //Variabili di stringa
     //Comunicazione al main in caso di ricerca
     comm: '',
+
+    carosellTime: '',
 
 
 });
