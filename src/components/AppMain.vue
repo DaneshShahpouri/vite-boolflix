@@ -1,5 +1,6 @@
 <script>
 import { store } from '../store.js';
+import AppSearchScreen from './AppSearchScreen.vue';
 
 
 
@@ -13,6 +14,10 @@ export default {
     }
   },
 
+  components: {
+    AppSearchScreen,
+  },
+
   emits: ['prevpage', 'nextpage'],
 
   methods: {
@@ -20,11 +25,13 @@ export default {
       let container = document.querySelectorAll('.wrapper-thumb-bar');
       container[index].scrollLeft -= 750
     },
+
     scrollRightThumb(index) {
       let container = document.querySelectorAll('.wrapper-thumb-bar');
       container[index].scrollLeft += 750
     },
 
+    // -----ChangeVariable-----
     changeDaylyIndex(index) {
       this.store.isDaily = true;
       this.store.isSerie = false;
@@ -33,12 +40,15 @@ export default {
       clearInterval(this.store.carosellTime)
       this.changeIndexGlobal();
 
+
+
       this.store.isAnimate = true
       setTimeout(() => {
         this.store.isAnimate = false
       }, 1200)
 
     },
+
     changeWeekIndex(index) {
       this.store.isDaily = false;
       this.store.isSerie = false;
@@ -54,6 +64,7 @@ export default {
       }, 1200)
 
     },
+
     changeSeriesIndex(index) {
       this.store.isDaily = false;
       this.store.isSerie = true;
@@ -75,7 +86,6 @@ export default {
       this.store.carosellTime = setInterval(() => {
         this.store.globalindex++
 
-        //console.log(this.store.globalindex)
 
         if (this.store.isDaily && this.store.globalindex == this.store.ApiTrendDailyArray.length) {
           this.store.globalindex = 0;
@@ -84,22 +94,80 @@ export default {
         } else if (this.store.isSerie && this.store.globalindex == this.store.Apigenre.length) {
           this.store.globalindex = 0;
         }
-        //console.log('intervallo attivo dal click della miniatura')
+
+        this.CastIndex()
 
         this.store.isAnimate = true;
 
         setTimeout(() => {
           this.store.isAnimate = false
-          //console.log('isanimate timeout' + this.store.isAnimate)
+
         }, 1200)
-        //console.log('isanimate interval' + this.store.isAnimate)
+
       }, 6000)
+    },
+
+    CastIndex() {
+      //Cambio del globalID
+      if (this.store.isDaily) {
+        this.store.globalId = this.store.ApiTrendDailyArray[this.store.globalindex].id
+      } else if (this.store.isWeekly) {
+        this.store.globalId = this.store.ApiTrendWeekArray[this.store.globalindex].id
+      } else if (this.store.isSerie) {
+        this.store.globalId = this.store.Apigenre[this.store.globalindex].id
+      }
+    },
+    // -----ChangeVariable----
+
+    genreResoult(parametro) {
+      let resoult = parametro;
+      switch (resoult) {
+        case 28: resoult = 'Azione'; break;
+        case 12: resoult = 'Avventura'; break;
+        case 16: resoult = 'Animazione'; break;
+        case 35: resoult = 'Commedia'; break;
+        case 80: resoult = 'Crime'; break;
+        case 99: resoult = 'Documentario'; break;
+        case 18: resoult = 'Dramma'; break;
+        case 10751: resoult = 'Famiglia'; break;
+        case 14: resoult = 'Fantasy'; break;
+        case 36: resoult = 'Storico'; break;
+        case 27: resoult = 'Horror'; break;
+        case 10402: resoult = 'Musica'; break;
+        case 9648: resoult = 'Mistero'; break;
+        case 10749: resoult = 'Romantico'; break;
+        case 878: resoult = 'Science Fiction'; break;
+        case 10770: resoult = 'Film tv'; break;
+        case 53: resoult = 'Thriller'; break;
+        case 10752: resoult = 'Guerra'; break;
+        case 37: resoult = 'Western'; break;
+
+        case 10759: resoult = 'Azione/Avventura'; break;
+        case 16: resoult = 'Animazione'; break;
+        case 35: resoult = 'Commedia'; break;
+        case 80: resoult = 'Crime'; break;
+        case 99: resoult = 'Documentario'; break;
+        case 18: resoult = 'Dramma'; break;
+        case 10751: resoult = 'Famiglia'; break;
+        case 10762: resoult = 'Kids'; break;
+        case 9648: resoult = 'Mistero'; break;
+        case 10763: resoult = 'News'; break;
+        case 10764: resoult = 'Reality'; break;
+        case 10765: resoult = 'Sci-fi&Fantasy'; break;
+        case 10766: resoult = 'Soap'; break;
+        case 10767: resoult = 'Talk'; break;
+        case 10768: resoult = 'Guerra&Politica'; break;
+        case 37: resoult = 'Western'; break;
+
+      }
+      //console.log('il risultato è ' + resoult)
+      return resoult
     }
   },
 
   mounted() {
     this.changeIndexGlobal();
-    //console.log('intervallo partito dal mounted del main')
+
   }
 }
 </script>
@@ -115,239 +183,279 @@ export default {
           <div class="info-main-wrapper">
             <div class="top-side">
 
-              <!-- Titolo Main -->
-              <div class="title" v-if="this.store.isDaily">
-                {{ (this.store.ApiTrendDailyArray[this.store.globalindex].media_type === "movie" ?
-                  this.store.ApiTrendDailyArray[this.store.globalindex].title :
-                  this.store.ApiTrendDailyArray[this.store.globalindex].name) }}
-              </div>
-              <div class="title" v-if="this.store.isWeekly">
-                {{ (this.store.ApiTrendWeekArray[this.store.globalindex].media_type === "movie" ?
-                  this.store.ApiTrendWeekArray[this.store.globalindex].title :
-                  this.store.ApiTrendWeekArray[this.store.globalindex].name) }}
-              </div>
-              <div class="title" v-if="this.store.isSerie">
-                {{ (this.store.Apigenre[this.store.globalindex].media_type === "movie" ?
-                  this.store.Apigenre[this.store.globalindex].title :
-                  this.store.Apigenre[this.store.globalindex].name) }}
-              </div>
+              <div class="title-and-flag">
 
-              <!-- Tipo -->
-              <div class="info-type" v-if="this.store.isDaily">
-                {{ this.store.ApiTrendDailyArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
-              </div>
-              <div class="info-type" v-if="this.store.isWeekly">
-                {{ this.store.ApiTrendWeekArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
-              </div>
-              <div class="info-type" v-if="this.store.isSerie">
-                {{ this.store.Apigenre[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
-              </div>
-
-              <!-- Stelle -->
-              <div class="starwrapper" v-if="this.store.isDaily">
-
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 8"><i
-                      class="fa-solid fa-star"></i></div>
+                <!-- Titolo Main -->
+                <div class="title" v-if="this.store.isDaily">
+                  {{ (this.store.ApiTrendDailyArray[this.store.globalindex].media_type === "movie" ?
+                    this.store.ApiTrendDailyArray[this.store.globalindex].title :
+                    this.store.ApiTrendDailyArray[this.store.globalindex].name) }}
                 </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 6"><i
-                      class="fa-solid fa-star"></i></div>
+                <div class="title" v-if="this.store.isWeekly">
+                  {{ (this.store.ApiTrendWeekArray[this.store.globalindex].media_type === "movie" ?
+                    this.store.ApiTrendWeekArray[this.store.globalindex].title :
+                    this.store.ApiTrendWeekArray[this.store.globalindex].name) }}
                 </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 4"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 2"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average > 0"><i
-                      class="fa-solid fa-star"></i></div>
+                <div class="title" v-if="this.store.isSerie">
+                  {{ (this.store.Apigenre[this.store.globalindex].media_type === "movie" ?
+                    this.store.Apigenre[this.store.globalindex].title :
+                    this.store.Apigenre[this.store.globalindex].name) }}
                 </div>
 
               </div>
 
-              <div class="starwrapper" v-if="this.store.isWeekly">
+              <div class="years-star-type">
+
+                <!-- Stelle -->
+                <div class="starwrapper" v-if="this.store.isDaily">
 
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 8"><i
-                      class="fa-solid fa-star"></i></div>
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 8"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 6"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 4"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average >= 2"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendDailyArray[this.store.globalindex].vote_average > 0"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
                 </div>
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 6"><i
-                      class="fa-solid fa-star"></i></div>
+                <div class="starwrapper" v-if="this.store.isWeekly">
+
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 8"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 6"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 4"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 2"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average > 0"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
                 </div>
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 4"><i
-                      class="fa-solid fa-star"></i></div>
+                <div class="starwrapper" v-if="this.store.isSerie">
+
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 8"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 6"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 4"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 2"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                  <div class="star-empty">
+                    <i class="fa-regular fa-star"></i>
+                    <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average > 0"><i
+                        class="fa-solid fa-star"></i></div>
+                  </div>
+
+                </div>
+                <!-- Stelle -->
+
+                <!-- Tipo -->
+                <div class="info-type" v-if="this.store.isDaily">
+                  {{ this.store.ApiTrendDailyArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
+                </div>
+                <div class="info-type" v-if="this.store.isWeekly">
+                  {{ this.store.ApiTrendWeekArray[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
+                </div>
+                <div class="info-type" v-if="this.store.isSerie">
+                  {{ this.store.Apigenre[this.store.globalindex].media_type == 'movie' ? 'Film' : 'Serie Tv' }}
                 </div>
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average >= 2"><i
-                      class="fa-solid fa-star"></i></div>
+                <!-- data -->
+                <div class="release-date" v-if="this.store.isDaily">
+                  {{ store.ApiTrendDailyArray[this.store.globalindex].media_type == "movie" ?
+                    store.ApiTrendDailyArray[this.store.globalindex].release_date.substr(0, 4) :
+                    store.ApiTrendDailyArray[this.store.globalindex].first_air_date.substr(0, 4) }}
+                </div>
+                <div class="release-date" v-if="this.store.isWeekly">
+                  {{ store.ApiTrendWeekArray[this.store.globalindex].media_type == "movie" ?
+                    store.ApiTrendWeekArray[this.store.globalindex].release_date.substr(0, 4) :
+                    store.ApiTrendWeekArray[this.store.globalindex].first_air_date.substr(0, 4) }}
+                </div>
+                <div class="release-date" v-if="this.store.isSerie">
+                  {{ store.Apigenre[this.store.globalindex].media_type == "movie" ?
+                    store.Apigenre[this.store.globalindex].release_date.substr(0, 4) :
+                    store.Apigenre[this.store.globalindex].first_air_date.substr(0, 4) }}
                 </div>
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.ApiTrendWeekArray[this.store.globalindex].vote_average > 0"><i
-                      class="fa-solid fa-star"></i></div>
+                <!-- Flag -->
+                <div class="lang" v-if="this.store.isDaily">
+                  <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
+
+                  <span :class="'fi fi-gb'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'en'"></span>
+                  <span :class="'fi fi-jp'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ja'"></span>
+                  <span :class="'fi fi-kr'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ko'"></span>
+                  <span :class="'fi fi-ht'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'hi'"></span>
+                  <span :class="'fi fi-dk'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'da'"></span>
+                  <span :class="'fi fi-fk'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'fa'"></span>
+                  <span :class="'fi fi-uy'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ur'"></span>
+                  <span :class="'fi fi-cn'"
+                    v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'zh'"></span>
+
+
+                  <span :class="'fi fi-' + store.ApiTrendDailyArray[this.store.globalindex].original_language" v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language != 'en' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language != 'ja' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language != 'ko' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language != 'da' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language == 'hi' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language == 'zh' ||
+                    store.ApiTrendDailyArray[this.store.globalindex].original_language == 'fa'"></span>
+                </div>
+                <div class="lang" v-if="this.store.isWeekly">
+                  <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
+
+                  <span :class="'fi fi-gb'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'en'"></span>
+                  <span :class="'fi fi-jp'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ja'"></span>
+                  <span :class="'fi fi-kr'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ko'"></span>
+                  <span :class="'fi fi-ht'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'hi'"></span>
+                  <span :class="'fi fi-dk'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'da'"></span>
+                  <span :class="'fi fi-fk'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'fa'"></span>
+                  <span :class="'fi fi-uy'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ur'"></span>
+                  <span :class="'fi fi-cn'"
+                    v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'zh'"></span>
+
+
+                  <span :class="'fi fi-' + store.ApiTrendWeekArray[this.store.globalindex].original_language" v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language != 'en' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language != 'ja' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language != 'ko' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language != 'da' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language == 'hi' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language == 'zh' ||
+                    store.ApiTrendWeekArray[this.store.globalindex].original_language == 'fa'"></span>
+                </div>
+                <div class="lang" v-if="this.store.isSerie">
+                  <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
+
+                  <span :class="'fi fi-gb'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'en'"></span>
+                  <span :class="'fi fi-jp'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'ja'"></span>
+                  <span :class="'fi fi-kr'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'ko'"></span>
+                  <span :class="'fi fi-ht'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'hi'"></span>
+                  <span :class="'fi fi-dk'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'da'"></span>
+                  <span :class="'fi fi-fk'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'fa'"></span>
+                  <span :class="'fi fi-uy'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'ur'"></span>
+                  <span :class="'fi fi-cn'"
+                    v-if="store.Apigenre[this.store.globalindex].original_language == 'zh'"></span>
+
+
+                  <span :class="'fi fi-' + store.Apigenre[this.store.globalindex].original_language" v-if="store.Apigenre[this.store.globalindex].original_language != 'en' ||
+                    store.Apigenre[this.store.globalindex].original_language != 'ja' ||
+                    store.Apigenre[this.store.globalindex].original_language != 'ko' ||
+                    store.Apigenre[this.store.globalindex].original_language != 'da' ||
+                    store.Apigenre[this.store.globalindex].original_language == 'hi' ||
+                    store.Apigenre[this.store.globalindex].original_language == 'zh' ||
+                    store.Apigenre[this.store.globalindex].original_language == 'fa'"></span>
                 </div>
 
               </div>
 
-              <div class="starwrapper" v-if="this.store.isSerie">
+              <div class="genre">
+                <span v-if="this.store.isDaily"
+                  v-for="(genre, index) in this.store.ApiTrendDailyArray[this.store.globalindex].genre_ids">
+                  {{ index < this.store.ApiTrendDailyArray[this.store.globalindex].genre_ids.length - 1 ?
+                    genreResoult(genre) + ', ' : genreResoult(genre) }} </span>
 
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 8"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
 
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 6"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 4"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average >= 2"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-                <div class="star-empty">
-                  <i class="fa-regular fa-star"></i>
-                  <div class="star" v-if="store.Apigenre[this.store.globalindex].vote_average > 0"><i
-                      class="fa-solid fa-star"></i></div>
-                </div>
-
-              </div>
-              <!-- Stelle -->
-
-
-              <!-- data -->
-              <div class="release-date" v-if="this.store.isDaily">
-                {{ store.ApiTrendDailyArray[this.store.globalindex].media_type == "movie" ?
-                  store.ApiTrendDailyArray[this.store.globalindex].release_date.substr(0, 4) :
-                  store.ApiTrendDailyArray[this.store.globalindex].first_air_date.substr(0, 4) }}
-              </div>
-              <div class="release-date" v-if="this.store.isWeekly">
-                {{ store.ApiTrendWeekArray[this.store.globalindex].media_type == "movie" ?
-                  store.ApiTrendWeekArray[this.store.globalindex].release_date.substr(0, 4) :
-                  store.ApiTrendWeekArray[this.store.globalindex].first_air_date.substr(0, 4) }}
-              </div>
-              <div class="release-date" v-if="this.store.isSerie">
-                {{ store.Apigenre[this.store.globalindex].media_type == "movie" ?
-                  store.Apigenre[this.store.globalindex].release_date.substr(0, 4) :
-                  store.Apigenre[this.store.globalindex].first_air_date.substr(0, 4) }}
+                    <span v-if="this.store.isWeekly"
+                      v-for="(genre, index) in this.store.ApiTrendWeekArray[this.store.globalindex].genre_ids">{{ index <
+                        this.store.ApiTrendWeekArray[this.store.globalindex].genre_ids.length - 1 ? genreResoult(genre)
+                      + ', ' : genreResoult(genre) }}</span>
+                        <span v-if="this.store.isSerie"
+                          v-for="(genre, index) in this.store.Apigenre[this.store.globalindex].genre_ids">{{ index <
+                            this.store.Apigenre[this.store.globalindex].genre_ids.length - 1 ? genreResoult(genre) + ', '
+                            : genreResoult(genre) }}</span>
               </div>
 
-              <div class="lang" v-if="this.store.isDaily">
-                <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
 
-                <span :class="'fi fi-gb'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'en'"></span>
-                <span :class="'fi fi-jp'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ja'"></span>
-                <span :class="'fi fi-kr'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ko'"></span>
-                <span :class="'fi fi-ht'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'hi'"></span>
-                <span :class="'fi fi-dk'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'da'"></span>
-                <span :class="'fi fi-fk'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'fa'"></span>
-                <span :class="'fi fi-uy'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'ur'"></span>
-                <span :class="'fi fi-cn'"
-                  v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language == 'zh'"></span>
-
-
-                <span :class="'fi fi-' + store.ApiTrendDailyArray[this.store.globalindex].original_language" v-if="store.ApiTrendDailyArray[this.store.globalindex].original_language != 'en' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language != 'ja' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language != 'ko' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language != 'da' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language == 'hi' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language == 'zh' ||
-                  store.ApiTrendDailyArray[this.store.globalindex].original_language == 'fa'"></span>
-              </div>
-              <div class="lang" v-if="this.store.isWeekly">
-                <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
-
-                <span :class="'fi fi-gb'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'en'"></span>
-                <span :class="'fi fi-jp'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ja'"></span>
-                <span :class="'fi fi-kr'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ko'"></span>
-                <span :class="'fi fi-ht'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'hi'"></span>
-                <span :class="'fi fi-dk'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'da'"></span>
-                <span :class="'fi fi-fk'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'fa'"></span>
-                <span :class="'fi fi-uy'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'ur'"></span>
-                <span :class="'fi fi-cn'"
-                  v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language == 'zh'"></span>
-
-
-                <span :class="'fi fi-' + store.ApiTrendWeekArray[this.store.globalindex].original_language" v-if="store.ApiTrendWeekArray[this.store.globalindex].original_language != 'en' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language != 'ja' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language != 'ko' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language != 'da' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language == 'hi' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language == 'zh' ||
-                  store.ApiTrendWeekArray[this.store.globalindex].original_language == 'fa'"></span>
-              </div>
-              <div class="lang" v-if="this.store.isSerie">
-                <!-- {{ store.ApiTrendDailyArray[this.store.globalindex].original_language }} -->
-
-                <span :class="'fi fi-gb'" v-if="store.Apigenre[this.store.globalindex].original_language == 'en'"></span>
-                <span :class="'fi fi-jp'" v-if="store.Apigenre[this.store.globalindex].original_language == 'ja'"></span>
-                <span :class="'fi fi-kr'" v-if="store.Apigenre[this.store.globalindex].original_language == 'ko'"></span>
-                <span :class="'fi fi-ht'" v-if="store.Apigenre[this.store.globalindex].original_language == 'hi'"></span>
-                <span :class="'fi fi-dk'" v-if="store.Apigenre[this.store.globalindex].original_language == 'da'"></span>
-                <span :class="'fi fi-fk'" v-if="store.Apigenre[this.store.globalindex].original_language == 'fa'"></span>
-                <span :class="'fi fi-uy'" v-if="store.Apigenre[this.store.globalindex].original_language == 'ur'"></span>
-                <span :class="'fi fi-cn'" v-if="store.Apigenre[this.store.globalindex].original_language == 'zh'"></span>
-
-
-                <span :class="'fi fi-' + store.Apigenre[this.store.globalindex].original_language" v-if="store.Apigenre[this.store.globalindex].original_language != 'en' ||
-                  store.Apigenre[this.store.globalindex].original_language != 'ja' ||
-                  store.Apigenre[this.store.globalindex].original_language != 'ko' ||
-                  store.Apigenre[this.store.globalindex].original_language != 'da' ||
-                  store.Apigenre[this.store.globalindex].original_language == 'hi' ||
-                  store.Apigenre[this.store.globalindex].original_language == 'zh' ||
-                  store.Apigenre[this.store.globalindex].original_language == 'fa'"></span>
+              <div class="cast">
+                <span v-for="actor in this.store.globalCast">{{ actor }}</span>
               </div>
             </div>
+
 
             <!-- Sinossi -->
             <div class="over-view" v-if="this.store.isDaily">
@@ -377,6 +485,8 @@ export default {
         </div>
       </div>
 
+      <!-- Consigliati -->
+      <div class="consi_wrapper"></div>
       <!--Popolari Oggi-->
       <div class="anteprima-bar trendgiornalieri" v-if="!store.isSearch">
         <h3 class="bar-title main">Popolari Oggi</h3>
@@ -465,112 +575,8 @@ export default {
 
 
 
-
       <!------- Schermo di ricerca -------------->
-
-      <div class="research-screen" v-else>
-
-        <span class="comunication-span" v-if="this.store.comm != ''">{{ this.store.comm }}</span>
-
-        <div class="pages" v-if="this.store.isMorePage">
-          <div class="prevpage" @click="$emit('prevpage')" v-if="this.store.PagNum > 1"><i
-              class="fa-solid fa-arrow-left"></i></div>
-          <div class="prevpage" v-if="this.store.PagNum <= 1"></div>
-          <span>page {{ this.store.PagNum }}</span>
-          <div class="nextpage" @click="$emit('nextpage')"><i class="fa-solid fa-arrow-right"></i></div>
-        </div>
-
-        <div class="card-search" v-for="element in this.store.ApiResearchArray"
-          v-if="this.store.ApiResearchArray.length > 0">
-
-          <div class="info-wrapper">
-            <span class="title">
-
-              <strong>
-                {{ this.store.isFilmResearch ? element.title : (element.media_type == "movie" ? element.title :
-                  element.name) }}
-              </strong>
-            </span>
-            <span class="original-title">
-
-              Original Title:
-              <strong>
-                {{ this.store.isFilmResearch ? element.original_title : (element.media_type == "movie" ?
-                  element.original_title : element.original_name) }}
-              </strong>
-
-              <!-- Voto -->
-            </span>
-
-            <div class="starwrapper">
-
-
-              <div class="star-empty">
-                <i class="fa-regular fa-star"></i>
-                <div class="star" v-if="element.vote_average >= 8"><i class="fa-solid fa-star"></i></div>
-              </div>
-
-              <div class="star-empty">
-                <i class="fa-regular fa-star"></i>
-                <div class="star" v-if="element.vote_average >= 6"><i class="fa-solid fa-star"></i></div>
-              </div>
-
-              <div class="star-empty">
-                <i class="fa-regular fa-star"></i>
-                <div class="star" v-if="element.vote_average >= 4"><i class="fa-solid fa-star"></i></div>
-              </div>
-
-              <div class="star-empty">
-                <i class="fa-regular fa-star"></i>
-                <div class="star" v-if="element.vote_average >= 2"><i class="fa-solid fa-star"></i></div>
-              </div>
-
-              <div class="star-empty">
-                <i class="fa-regular fa-star"></i>
-                <div class="star" v-if="element.vote_average > 0"><i class="fa-solid fa-star"></i></div>
-              </div>
-
-            </div>
-
-            <div class="release-date">
-              {{ this.store.isFilmResearch ? element.release_date : (element.media_type == "movie" ? element.release_date
-                :
-                element.first_air_date) }}
-            </div>
-
-            <div class="lang">
-              <!-- {{ element.original_language }} -->
-
-              <span :class="'fi fi-gb'" v-if="element.original_language == 'en'"></span>
-              <span :class="'fi fi-jp'" v-if="element.original_language == 'ja'"></span>
-              <span :class="'fi fi-kr'" v-if="element.original_language == 'ko'"></span>
-              <span :class="'fi fi-ht'" v-if="element.original_language == 'hi'"></span>
-              <span :class="'fi fi-dk'" v-if="element.original_language == 'da'"></span>
-              <span :class="'fi fi-fk'" v-if="element.original_language == 'fa'"></span>
-              <span :class="'fi fi-uy'" v-if="element.original_language == 'ur'"></span>
-              <span :class="'fi fi-cn'" v-if="element.original_language == 'zh'"></span>
-
-
-              <span :class="'fi fi-' + element.original_language" v-if="element.original_language != 'en' ||
-                element.original_language != 'ja' ||
-                element.original_language != 'ko' ||
-                element.original_language != 'da' ||
-                element.original_language == 'hi' ||
-                element.original_language == 'zh' ||
-                element.original_language == 'fa'"></span>
-            </div>
-
-          </div>
-
-          <div class=" shadow-over-bg">
-          </div>
-          <!-- posizione relative -->
-          <div class="bg-cards">
-            <img :src="`${this.store.ApiBasehttps}/original${element.poster_path}`" alt="">
-          </div>
-        </div>
-      </div>
-
+      <AppSearchScreen v-else @prevpage="$emit('prevpage')" @nextpage="$emit('nextpage')"></AppSearchScreen>
 
 
     </div>
@@ -616,24 +622,34 @@ export default {
             animation: appearTexttoLeft .4s
           }
 
-          .info-type {
-            position: relative;
-            animation: hiddenStart .1s, appearTexttoLeft .4s .1s
-          }
+          // .info-type {
+          //   position: relative;
+          //   animation: hiddenStart .1s, appearTexttoLeft .4s .1s
+          // }
 
-          .starwrapper {
+          // .starwrapper {
+          //   position: relative;
+          //   animation: hiddenStart .2s, appearTexttoLeft .4s .2s
+          // }
+
+          // .release-date {
+          //   position: relative;
+          //   animation: hiddenStart .3s, appearTexttoLeft .4s .3s
+          // }
+
+          // .lang {
+          //   position: relative;
+          //   animation: hiddenStart .4s, appearTexttoLeft .4s .4s
+          // }
+
+          .years-star-type {
             position: relative;
             animation: hiddenStart .2s, appearTexttoLeft .4s .2s
           }
 
-          .release-date {
+          .genre {
             position: relative;
             animation: hiddenStart .3s, appearTexttoLeft .4s .3s
-          }
-
-          .lang {
-            position: relative;
-            animation: hiddenStart .4s, appearTexttoLeft .4s .4s
           }
 
           .over-view {
@@ -649,16 +665,12 @@ export default {
       height: 60%;
       margin: 1em .5em;
 
-
-
-
       .shadows-img {
         width: 100%;
         height: 600px;
         position: absolute;
         background: linear-gradient(.25turn, $backgroundColor 25%, rgba(0, 0, 0, 0)80%);
         scale: 1;
-
 
         z-index: 1;
       }
@@ -693,10 +705,27 @@ export default {
             flex-direction: column;
             gap: .5em;
 
+            .years-star-type,
+            .title-and-flag {
+              width: 100%;
+              display: flex;
+              flex-flow: row nowrap;
+              align-items: center;
+              gap: 1em;
+            }
+
+            .genre {
+              span {
+                font-size: .9em;
+                font-weight: 200;
+                color: grey;
+              }
+            }
+
           }
 
           .title {
-            margin-top: 0.5em;
+
             font-size: 2.1em;
             font-weight: 600;
           }
@@ -711,13 +740,15 @@ export default {
               position: absolute;
               top: 0;
               left: 0;
-              z-index: 1;
+              z-index: 0;
               color: $secondary;
+              scale: 1;
 
               &-empty {
                 position: relative;
-                z-index: 1;
+                z-index: 2;
                 text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.315);
+                scale: .9;
               }
             }
           }
@@ -740,7 +771,7 @@ export default {
 
   .anteprima-bar {
     width: 100%;
-    height: 200px;
+    height: 400px;
     display: flex;
     position: relative;
     flex-direction: column;
@@ -772,7 +803,7 @@ export default {
 
       .btn {
         position: absolute;
-        height: 125px;
+        height: 155px;
 
         border-radius: 0;
         border: 0;
@@ -807,7 +838,7 @@ export default {
     .wrapper-thumb-bar {
       display: flex;
       align-items: center;
-      gap: 1em;
+      gap: .2em;
 
 
       height: 100%;
@@ -842,8 +873,8 @@ export default {
 
         &:hover {
           opacity: 1;
-
-          scale: 1.1;
+          scale: 1.2;
+          margin: 0 1.1em;
 
           &>.bg-thumb {
             opacity: .9;
@@ -880,156 +911,7 @@ export default {
 
   }
 
-  .research-screen {
-    width: 100%;
-    height: 100%;
-    margin-top: 5em;
-    margin-bottom: 2em;
-    display: flex;
-    flex-flow: row wrap;
-    gap: 10px;
-    align-items: center;
-    align-content: flex-start;
-    justify-content: center;
 
-    .pages {
-      position: absolute;
-      top: 20px;
-      display: flex;
-      align-items: center;
-      gap: 1em;
-
-      span {
-        color: grey;
-        cursor: default;
-      }
-
-      .prevpage,
-      .nextpage {
-        font-size: .8em;
-        padding: 1em;
-        color: rgb(163, 163, 163);
-        cursor: pointer;
-
-        &:hover {
-          color: white;
-        }
-      }
-    }
-
-    .comunication-span {
-      font-size: 1.2em;
-      text-align: center;
-      width: 100%;
-
-      animation: appear .4s;
-    }
-
-
-    .card-search {
-      width: 200px;
-      height: 300px;
-      margin: 2em 0;
-      background: white;
-      position: relative;
-
-
-
-      &:hover .info-wrapper {
-        opacity: 1;
-      }
-
-      .info-wrapper {
-        position: absolute;
-        z-index: 1;
-        padding: .5em;
-        opacity: 0;
-
-        @include d-flex-col-center();
-        justify-content: flex-start;
-        align-items: stretch;
-        gap: 1em;
-
-
-        .title {
-          font-size: .9em;
-          text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.639);
-          border: black;
-        }
-
-        .original-title {
-          font-size: .8em;
-        }
-
-        .starwrapper {
-          display: flex;
-          flex-direction: row-reverse;
-          justify-content: flex-end;
-          align-items: center;
-
-          .star {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            color: $secondary;
-
-            &-empty {
-              position: relative;
-              z-index: 1;
-              text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.315);
-            }
-          }
-        }
-
-        .release-date {
-          font-size: .8em;
-        }
-
-        .lang {
-          font-size: .9em;
-        }
-      }
-
-      .shadow-over-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: radial-gradient(rgba(0, 0, 0, 0) 70%, $backgroundColor 150%);
-        width: 100%;
-        height: 100%;
-        z-index: 2;
-        opacity: 1;
-
-        &:hover+.bg-cards>img {
-          background: radial-gradient(rgba(0, 0, 0, 0) 70%, $backgroundColor 120%);
-          opacity: .3;
-        }
-      }
-
-      .bg-cards {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background-color: black;
-
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          opacity: .8;
-          scale: 1.15;
-        }
-
-      }
-    }
-
-
-  }
 }
 
 @media screen and (max-width: 950px) {
@@ -1057,6 +939,7 @@ export default {
               display: flex;
               flex-direction: column;
               gap: .5em;
+
 
               .title {
                 margin-top: .2em;

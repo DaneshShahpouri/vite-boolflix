@@ -237,6 +237,19 @@ export default {
 
     },
 
+    GetCast() {
+      let call = `https://api.themoviedb.org/3/movie/${this.store.globalId}/credits?api_key=017b7d25b6cd87444b6dd86827b3e4cc`
+      //Chiamata per genre
+      axios.get(call).then((res) => {
+        this.store.globalCast = [];
+
+        for (let i = 0; i < 5; i++) {
+          this.store.globalCast.push(res.data.cast[i].name)
+        }
+      });
+
+    },
+
     //Attivatori Stati Generali
     activeGeneralStatus() {
       this.store.isGeneralResearch = true;
@@ -272,12 +285,11 @@ export default {
     //Chiamata per trend giornaliero generico
     axios.get('https://api.themoviedb.org/3/trending/all/day?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT').then((res) => {
       res.data.results.forEach(element => {
-
         this.store.ApiTrendDailyArray.push(element);
       });
 
       this.store.isLoading = false;
-      ////console.log(this.store.ApiTrendDailyArray)
+      console.log(this.store.ApiTrendDailyArray)
 
     }).catch((err) => {
       console.log('errore nella chiamata api');
@@ -314,6 +326,10 @@ export default {
       this.store.isLoading = false;
     });
 
+    //Chiamata per genre
+    axios.get('https://api.themoviedb.org/3/genre/tv/list?api_key=017b7d25b6cd87444b6dd86827b3e4cc&').then((res) => {
+      //console.log(res)
+    });
 
 
 
@@ -340,6 +356,9 @@ export default {
     <div class="right-side">
       <AppNavbar @start-carosell="" @searchFilm="CallResearchFilm()" @searchSeries="CallResearchSerie()"></AppNavbar>
       <AppSearchBar @search="CallResearch(this.store.researchinput)" class="appSearchBar"></AppSearchBar>
+      <!-- DEBUG -->
+      <button class="BOTTO" @click="GetCast()">Cast</button>
+      <!-- DEBUG -->
       <AppMain @nextpage="nextpageCall()" @prevpage="prevpageCall()"></AppMain>
 
 
@@ -349,6 +368,11 @@ export default {
 
 <style lang="scss" scoped>
 @use './scss/variables' as *;
+
+.BOTTO {
+  position: absolute;
+  z-index: 10;
+}
 
 .main-container {
   width: 100%;
