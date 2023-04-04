@@ -237,18 +237,6 @@ export default {
 
     },
 
-    GetCast() {
-      let call = `https://api.themoviedb.org/3/movie/${this.store.globalId}/credits?api_key=017b7d25b6cd87444b6dd86827b3e4cc`
-      //Chiamata per genre
-      axios.get(call).then((res) => {
-        this.store.globalCast = [];
-
-        for (let i = 0; i < 5; i++) {
-          this.store.globalCast.push(res.data.cast[i].name)
-        }
-      });
-
-    },
 
     //Attivatori Stati Generali
     activeGeneralStatus() {
@@ -276,6 +264,139 @@ export default {
       clearInterval(this.store.carosellTime);
     },
 
+    // -----ChangeVariable-----
+    changeDaylyIndex(index) {
+      this.store.isDaily = true;
+      this.store.isSerie = false;
+      this.store.isWeekly = false;
+      this.store.globalindex = index;
+      clearInterval(this.store.carosellTime)
+      this.CastIndex();
+      this.changeIndexGlobal();
+
+
+
+
+      this.store.isAnimate = true
+      setTimeout(() => {
+        this.store.isAnimate = false
+      }, 1200)
+
+    },
+
+    changeWeekIndex(index) {
+      this.store.isDaily = false;
+      this.store.isSerie = false;
+      this.store.isWeekly = true;
+      this.store.globalindex = index;
+
+      clearInterval(this.store.carosellTime)
+      this.CastIndex();
+      this.changeIndexGlobal();
+
+      this.store.isAnimate = true
+      setTimeout(() => {
+        this.store.isAnimate = false
+      }, 1200)
+
+    },
+
+    changeSeriesIndex(index) {
+      this.store.isDaily = false;
+      this.store.isSerie = true;
+      this.store.isWeekly = false;
+      this.store.globalindex = index;
+
+      clearInterval(this.store.carosellTime);
+      this.CastIndex();
+      this.changeIndexGlobal();
+
+      this.store.isAnimate = true
+      setTimeout(() => {
+        this.store.isAnimate = false
+      }, 1200)
+
+    },
+
+    changeIndexGlobal() {
+
+      this.store.carosellTime = setInterval(() => {
+        this.store.globalindex++
+
+
+        if (this.store.isDaily && this.store.globalindex == this.store.ApiTrendDailyArray.length) {
+          this.store.globalindex = 0;
+        } else if (this.store.isWeekly && this.store.globalindex == this.store.ApiTrendWeekArray.length) {
+          this.store.globalindex = 0;
+        } else if (this.store.isSerie && this.store.globalindex == this.store.Apigenre.length) {
+          this.store.globalindex = 0;
+        }
+
+        this.CastIndex()
+
+        this.store.isAnimate = true;
+
+        setTimeout(() => {
+          this.store.isAnimate = false
+
+        }, 1200)
+
+      }, 6000)
+    },
+
+    CastIndex() {
+      //Cambio del globalID
+      this.store.globalId = '';
+
+      if (this.store.isDaily) {
+        this.store.globalId = this.store.ApiTrendDailyArray[this.store.globalindex].id;
+        if (this.store.ApiTrendDailyArray[this.store.globalindex].media_type == 'movie') {
+          this.store.typeOfCast = 'movie'
+        } else {
+          this.store.typeOfCast = 'tv';
+        }
+
+      } else if (this.store.isWeekly) {
+        this.store.globalId = this.store.ApiTrendWeekArray[this.store.globalindex].id;
+        if (this.store.ApiTrendWeekArray[this.store.globalindex].media_type == 'movie') {
+          this.store.typeOfCast = 'movie'
+        } else {
+          this.store.typeOfCast = 'tv';
+        }
+      } else if (this.store.isSerie) {
+        this.store.globalId = this.store.Apigenre[this.store.globalindex].id;
+        this.store.typeOfCast = 'tv'
+      };
+
+
+      this.GetCast()
+
+    },
+
+    GetCast() {
+
+
+      let call = `https://api.themoviedb.org/3/${this.store.typeOfCast}/${this.store.globalId}/credits?api_key=017b7d25b6cd87444b6dd86827b3e4cc`
+      //Chiamata per genre
+      axios.get(call).then((res) => {
+        console.log(res)
+        this.store.globalCast = [];
+
+        if (res.data.cast.length > 5) {
+          for (let i = 0; i < 5; i++) {
+            this.store.globalCast.push(res.data.cast[i].name)
+          }
+
+        } else {
+          for (let i = 0; i < res.data.cast.length - 1; i++) {
+            this.store.globalCast.push(res.data.cast[i].name)
+          }
+        }
+      });
+
+    },
+    // -----ChangeVariable----
+
 
   },
 
@@ -287,6 +408,9 @@ export default {
       res.data.results.forEach(element => {
         this.store.ApiTrendDailyArray.push(element);
       });
+
+      this.store.globalId = this.store.ApiTrendDailyArray[0].id;
+      this.GetCast();
 
       this.store.isLoading = false;
       console.log(this.store.ApiTrendDailyArray)
@@ -335,6 +459,11 @@ export default {
 
   },
 
+  mounted() {
+    this.changeIndexGlobal();
+
+  },
+
   components: {
     AppSideBar,
     AppNavbar,
@@ -356,10 +485,9 @@ export default {
     <div class="right-side">
       <AppNavbar @start-carosell="" @searchFilm="CallResearchFilm()" @searchSeries="CallResearchSerie()"></AppNavbar>
       <AppSearchBar @search="CallResearch(this.store.researchinput)" class="appSearchBar"></AppSearchBar>
-      <!-- DEBUG -->
-      <button class="BOTTO" @click="GetCast()">Cast</button>
-      <!-- DEBUG -->
-      <AppMain @nextpage="nextpageCall()" @prevpage="prevpageCall()"></AppMain>
+
+      <AppMain @changeDayly="changeDaylyIndex" @changeWeek="changeWeekIndex" @changeSeries="changeSeriesIndex"
+        @nextpage="nextpageCall()" @prevpage="prevpageCall()"></AppMain>
 
 
     </div>
@@ -369,10 +497,6 @@ export default {
 <style lang="scss" scoped>
 @use './scss/variables' as *;
 
-.BOTTO {
-  position: absolute;
-  z-index: 10;
-}
 
 .main-container {
   width: 100%;

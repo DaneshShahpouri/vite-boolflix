@@ -5,8 +5,10 @@ export const store = reactive({
     researchinput: '',
     globalindex: 0,
     lastcall: '',
+
     globalId: '',
     globalCast: [],
+    typeOfCast: 'movie',
 
     //Api componenets
     APIBase: 'https://api.themoviedb.org/3',

@@ -18,7 +18,7 @@ export default {
     AppSearchScreen,
   },
 
-  emits: ['prevpage', 'nextpage'],
+  emits: ['prevpage', 'nextpage', 'changeDayly', 'changeWeek', 'changeSeries'],
 
   methods: {
     scrollLeftThumb(index) {
@@ -30,94 +30,6 @@ export default {
       let container = document.querySelectorAll('.wrapper-thumb-bar');
       container[index].scrollLeft += 750
     },
-
-    // -----ChangeVariable-----
-    changeDaylyIndex(index) {
-      this.store.isDaily = true;
-      this.store.isSerie = false;
-      this.store.isWeekly = false;
-      this.store.globalindex = index;
-      clearInterval(this.store.carosellTime)
-      this.changeIndexGlobal();
-
-
-
-      this.store.isAnimate = true
-      setTimeout(() => {
-        this.store.isAnimate = false
-      }, 1200)
-
-    },
-
-    changeWeekIndex(index) {
-      this.store.isDaily = false;
-      this.store.isSerie = false;
-      this.store.isWeekly = true;
-      this.store.globalindex = index;
-
-      clearInterval(this.store.carosellTime)
-      this.changeIndexGlobal();
-
-      this.store.isAnimate = true
-      setTimeout(() => {
-        this.store.isAnimate = false
-      }, 1200)
-
-    },
-
-    changeSeriesIndex(index) {
-      this.store.isDaily = false;
-      this.store.isSerie = true;
-      this.store.isWeekly = false;
-      this.store.globalindex = index;
-
-      clearInterval(this.store.carosellTime)
-      this.changeIndexGlobal();
-
-      this.store.isAnimate = true
-      setTimeout(() => {
-        this.store.isAnimate = false
-      }, 1200)
-
-    },
-
-    changeIndexGlobal() {
-
-      this.store.carosellTime = setInterval(() => {
-        this.store.globalindex++
-
-
-        if (this.store.isDaily && this.store.globalindex == this.store.ApiTrendDailyArray.length) {
-          this.store.globalindex = 0;
-        } else if (this.store.isWeekly && this.store.globalindex == this.store.ApiTrendWeekArray.length) {
-          this.store.globalindex = 0;
-        } else if (this.store.isSerie && this.store.globalindex == this.store.Apigenre.length) {
-          this.store.globalindex = 0;
-        }
-
-        this.CastIndex()
-
-        this.store.isAnimate = true;
-
-        setTimeout(() => {
-          this.store.isAnimate = false
-
-        }, 1200)
-
-      }, 6000)
-    },
-
-    CastIndex() {
-      //Cambio del globalID
-      if (this.store.isDaily) {
-        this.store.globalId = this.store.ApiTrendDailyArray[this.store.globalindex].id
-      } else if (this.store.isWeekly) {
-        this.store.globalId = this.store.ApiTrendWeekArray[this.store.globalindex].id
-      } else if (this.store.isSerie) {
-        this.store.globalId = this.store.Apigenre[this.store.globalindex].id
-      }
-    },
-    // -----ChangeVariable----
 
     genreResoult(parametro) {
       let resoult = parametro;
@@ -165,10 +77,7 @@ export default {
     }
   },
 
-  mounted() {
-    this.changeIndexGlobal();
 
-  }
 }
 </script>
 
@@ -452,7 +361,10 @@ export default {
 
 
               <div class="cast">
-                <span v-for="actor in this.store.globalCast">{{ actor }}</span>
+                <span>Cast: </span>
+                <span class="cast-span" v-if="this.store.globalCast.length > 0"
+                  v-for="(actor, index) in this.store.globalCast">{{ index < this.store.globalCast.length - 1 ? actor
+                    + ', ' : actor }}</span>
               </div>
             </div>
 
@@ -502,7 +414,7 @@ export default {
             <!-- V-For -->
             <div class="thumbnail" v-for="(element, index) in store.ApiTrendDailyArray"
               :class="this.store.isDaily ? (this.store.globalindex == index ? 'active' : '') : ''"
-              @click="changeDaylyIndex(index)">
+              @click="$emit('changeDayly', index)">
 
               <h3 class="title">
                 {{ element.media_type == 'movie' ? element.title : element.name }}
@@ -530,7 +442,7 @@ export default {
 
             <!-- V-For -->
             <div class="thumbnail" v-for="(element, index) in this.store.ApiTrendWeekArray"
-              @click="changeWeekIndex(index)"
+              @click="$emit('changeWeek', index)"
               :class="this.store.isWeekly ? (this.store.globalindex == index ? 'active' : '') : ''">
 
               <h3 class="title">
@@ -558,7 +470,7 @@ export default {
           <div class="wrapper-thumb-bar">
 
             <!-- V-For -->
-            <div class="thumbnail" v-for="(element, index) in this.store.Apigenre" @click="changeSeriesIndex(index)"
+            <div class="thumbnail" v-for="(element, index) in this.store.Apigenre" @click="$emit('changeSeries', index)"
               :class="this.store.isSerie ? (this.store.globalindex == index ? 'active' : '') : ''">
 
               <h3 class="title">
@@ -652,6 +564,11 @@ export default {
             animation: hiddenStart .3s, appearTexttoLeft .4s .3s
           }
 
+          .cast {
+            position: relative;
+            animation: hiddenStart .3s, appearTexttoLeft .4s .3s
+          }
+
           .over-view {
             position: relative;
             animation: hiddenStart .2s, appearTexttoLeft .4s .2s
@@ -719,6 +636,16 @@ export default {
                 font-size: .9em;
                 font-weight: 200;
                 color: grey;
+              }
+            }
+
+            .cast {
+              width: 50%;
+
+              .cast-span {
+                font-size: .9em;
+                font-weight: 500;
+                color: rgb(183, 183, 183);
               }
             }
 
