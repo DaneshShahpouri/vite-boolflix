@@ -21,8 +21,10 @@ export default {
   <div class="container">
     <div class="research-screen">
 
+      <!-- Span di comunicazione -->
       <span class="comunication-span" v-if="this.store.comm != ''">{{ this.store.comm }}</span>
 
+      <!-- Controllo Pagine -->
       <div class="pages" v-if="this.store.isMorePage">
         <div class="prevpage" @click="$emit('prevpage')" v-if="this.store.PagNum > 1"><i
             class="fa-solid fa-arrow-left"></i></div>
@@ -31,6 +33,9 @@ export default {
         <div class="nextpage" @click="$emit('nextpage')"><i class="fa-solid fa-arrow-right"></i></div>
       </div>
 
+
+
+      <!-- Card di ricerca -->
       <div class="card-search" v-for="element in this.store.ApiResearchArray"
         v-if="this.store.ApiResearchArray.length > 0">
 

@@ -93,7 +93,7 @@ export default {
 
     padding-left: 1em;
     font-size: 2em;
-    font-weight: 300;
+    font-weight: 600;
     text-shadow: .4px .5px rgba(255, 255, 255, 0.427);
 
 

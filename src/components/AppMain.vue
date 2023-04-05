@@ -491,6 +491,11 @@ export default {
       <AppSearchScreen v-else @prevpage="$emit('prevpage')" @nextpage="$emit('nextpage')"></AppSearchScreen>
 
 
+      <footer>
+        <div class="container-footer">
+          <span>Create By Danesh</span>
+        </div>
+      </footer>
     </div>
 
   </div>
@@ -838,6 +843,14 @@ export default {
 
   }
 
+  .container-footer {
+    margin: 1.5em;
+
+    span {
+      color: grey;
+      font-size: .7em;
+    }
+  }
 
 }
 

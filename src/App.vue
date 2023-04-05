@@ -24,47 +24,185 @@ export default {
       this.store.isSearch = true;
       this.store.PagNum = 1;
       this.store.lastcall = '';
+      let totalPagesVar = 1;
 
       clearInterval(this.store.carosellTime);
+      this.store.p = 1;
+      do {
 
-      if (this.store.isGeneralResearch) {
-        this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
-      } else if (this.store.isFilmResearch) {
-        this.store.call = 'https://api.themoviedb.org/3/search/' + 'movie' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
-      } else if (this.store.isSerieResearch) {
-        this.store.call = 'https://api.themoviedb.org/3/search/' + 'tv' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + '1' + '&include_adult=false'
-      }
-      this.store.lastcall = this.store.researchinput;
+        console.log
+        if (this.store.isGeneralResearch) {
+          this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + this.store.p + '&include_adult=false'
+        } else if (this.store.isFilmResearch) {
+          this.store.call = 'https://api.themoviedb.org/3/search/' + 'movie' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + this.store.p + '&include_adult=false'
+        } else if (this.store.isSerieResearch) {
+          this.store.call = 'https://api.themoviedb.org/3/search/' + 'tv' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.researchinput + '&page=' + this.store.p + '&include_adult=false'
+        }
+        this.store.lastcall = this.store.researchinput;
 
-      //Chiamata di ricerca
-      axios.get(this.store.call).then((res) => {
-        res.data.results.forEach(element => {
-          if (element.media_type != "person") {
+        //Chiamata di ricerca
+        axios.get(this.store.call).then((res) => {
 
-            this.store.ApiResearchArray.push(element);
+          totalPagesVar = res.data.total_pages;
 
+
+
+          res.data.results.forEach(element => {
+            if (element.media_type != "person") {
+
+
+              switch (this.store.genreSearchOption) {
+                case 'Azione':
+                  if (element.genre_ids.includes(28) || element.genre_ids.includes(10759)) {
+
+                    this.store.ApiResearchArray.push(element);
+
+                  }
+                  break;
+
+                case 'Avventura':
+                  if (element.genre_ids.includes(12) || element.genre_ids.includes(10759)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Animazione':
+                  if (element.genre_ids.includes(16)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Commedia':
+                  if (element.genre_ids.includes(35)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Crime':
+                  if (element.genre_ids.includes(80)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Documentario':
+                  if (element.genre_ids.includes(99)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Dramma':
+                  if (element.genre_ids.includes(18)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Famiglia':
+                  if (element.genre_ids.includes(10751)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Fantasy':
+                  if (element.genre_ids.includes(14) || element.genre_ids.includes(10765)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Storico':
+                  if (element.genre_ids.includes(36)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Horror':
+                  if (element.genre_ids.includes(27) || element.genre_ids.includes(9648)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Musica':
+                  if (element.genre_ids.includes(10402)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Mistero':
+                  if (element.genre_ids.includes(9648) || element.genre_ids.includes(9648)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Romantico':
+                  if (element.genre_ids.includes(10751) || element.genre_ids.includes(10766)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'ScienceFiction':
+                  if (element.genre_ids.includes(878) || element.genre_ids.includes(10765)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'FilmTv':
+                  if (element.genre_ids.includes(10770)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Thriller':
+                  if (element.genre_ids.includes(53)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Guerra':
+                  if (element.genre_ids.includes(10752)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Western':
+                  if (element.genre_ids.includes(37)) {
+                    this.store.ApiResearchArray.push(element);
+                  }
+                  break;
+
+                case 'Qualsiasi':
+                  this.store.ApiResearchArray.push(element);
+                  break;
+
+              }
+
+            };
+
+          });
+
+
+
+
+          this.store.isLoading = false;
+
+          if (this.store.ApiResearchArray.length == 20) {
+            this.store.isMorePage = true;
+          } else if (this.store.PagNum <= 1) {
+            this.store.isMorePage = false;
           }
+
+
+        }).catch((err) => {
+          console.log('errore nella chiamata api');
+
+          this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
+
 
         });
 
-        this.store.isLoading = false;
+        this.store.p += 1;
 
-        if (this.store.ApiResearchArray.length == 20) {
-          this.store.isMorePage = true;
-        } else if (this.store.PagNum <= 1) {
-          this.store.isMorePage = false;
-        }
+      } while (this.store.ApiResearchArray.length < 20 && totalPagesVar > this.store.p);
 
-        this.store.researchinput = '';
-
-      }).catch((err) => {
-        console.log('errore nella chiamata api');
-
-        this.store.comm = 'Spiacenti, la ricerca non è andata a buon fine'
-
-
-      });
-
+      this.store.researchinput = '';
       setTimeout(
         () => {
           if (this.store.ApiResearchArray.length < 1) {
@@ -84,8 +222,6 @@ export default {
       this.store.ApiResearchArray = [];
       this.store.isSearch = true;
 
-
-
       if (this.store.isGeneralResearch) {
         this.store.call = 'https://api.themoviedb.org/3/search/' + 'multi' + '?api_key=017b7d25b6cd87444b6dd86827b3e4cc&language=it-IT&query=' + this.store.lastcall + '&page=' + this.store.PagNum + '&include_adult=false'
       } else if (this.store.isFilmResearch) {
@@ -96,11 +232,14 @@ export default {
 
       axios.get(this.store.call).then((res) => {
         res.data.results.forEach(element => {
+          let genre;
           if (element.media_type != "person") {
 
-            this.store.ApiResearchArray.push(element);
 
+            this.store.ApiResearchArray.push(element)
+            console.log('page research: ' + this.store.ApiResearchArray)
           }
+
         });
 
         this.store.isLoading = false;
@@ -379,7 +518,7 @@ export default {
       let call = `https://api.themoviedb.org/3/${this.store.typeOfCast}/${this.store.globalId}/credits?api_key=017b7d25b6cd87444b6dd86827b3e4cc`
       //Chiamata per genre
       axios.get(call).then((res) => {
-        console.log(res)
+        //console.log(res)
         this.store.globalCast = [];
 
         if (res.data.cast.length > 5) {
@@ -413,7 +552,7 @@ export default {
       this.GetCast();
 
       this.store.isLoading = false;
-      console.log(this.store.ApiTrendDailyArray)
+      //console.log(this.store.ApiTrendDailyArray)
 
     }).catch((err) => {
       console.log('errore nella chiamata api');

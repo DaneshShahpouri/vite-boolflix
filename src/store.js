@@ -9,6 +9,7 @@ export const store = reactive({
     globalId: '',
     globalCast: [],
     typeOfCast: 'movie',
+    p: '',
 
     //Api componenets
     APIBase: 'https://api.themoviedb.org/3',
@@ -47,6 +48,8 @@ export const store = reactive({
 
     isMorePage: false,
     PagNum: 1,
+
+    genreSearchOption: 'Qualsiasi',
 
 
     //ServerStatus
